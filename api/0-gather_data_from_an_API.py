@@ -1,43 +1,32 @@
 #!/usr/bin/python3
 """
-A script that fetches and displays an employee's TODO list progress
-from the JSONPlaceholder REST API using their employee ID.
+A script that returns information about an employee's TODO list progress
+using a REST API, given an employee ID as an integer parameter.
 """
 
-import requests
 import sys
+import requests
+
 
 if __name__ == "__main__":
-    if len(sys.argv) < 2:
-        print("Usage: python3 0-gather_data_from_an_API.py <employee_id>")
-        sys.exit(1)
+    if len(sys.argv) > 1:
+        user_id = sys.argv[1]
+        user_url = f"https://jsonplaceholder.typicode.com/users/{user_id}"
+        todos_url = f"https://jsonplaceholder.typicode.com/todos?userId={user_id}"
 
-    try:
-        employee_id = int(sys.argv[1])
-    except ValueError:
-        sys.exit(1)
+        user_res = requests.get(user_url).json()
+        todos_res = requests.get(todos_url).json()
 
-    # API endpoints
-    user_url = f"https://jsonplaceholder.typicode.com/users/{employee_id}"
-    todos_url = f"https://jsonplaceholder.typicode.com/todos?userId={employee_id}"
+        employee_name = user_res.get("name")
+        total_tasks = len(todos_res)
+        
+        completed_tasks = [t for t in todos_res if t.get("completed") is True]
+        number_of_done = len(completed_tasks)
 
-    # Fetch data
-    user_response = requests.get(user_url).json()
-    todos_response = requests.get(todos_url).json()
+        print(
+            f"Employee {employee_name} is done with tasks("
+            f"{number_of_done}/{total_tasks}):"
+        )
 
-    employee_name = user_response.get("name")
-    total_tasks = len(todos_response)
-    
-    # Filter completed tasks
-    done_tasks = [task for task in todos_response if task.get("completed")]
-    number_of_done_tasks = len(done_tasks)
-
-    # Display progress header
-    print(
-        f"Employee {employee_name} is done with tasks("
-        f"{number_of_done_tasks}/{total_tasks}):"
-    )
-
-    # Display titles of completed tasks
-    for task in done_tasks:
-        print(f"\t {task.get('title')}")
+        for task in completed_tasks:
+            print(f"\t {task.get('title')}")
