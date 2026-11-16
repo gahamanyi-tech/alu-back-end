@@ -1,33 +1,22 @@
 #!/usr/bin/python3
-"""Return information about an employee's TODO list progress
-using the JSONPlaceholder REST API.
-
-Usage: python3 0-gather_data_from_an_API.py <employee_id>
-"""
+"""Return information about an employee's TODO list progress."""
 import requests
 import sys
 
-BASE_URL = "https://jsonplaceholder.typicode.com"
-
 
 if __name__ == "__main__":
-    employee_id = int(sys.argv[1])
+    url = "https://jsonplaceholder.typicode.com"
+    employee_id = sys.argv[1]
 
-    # Fetch the employee
-    user = requests.get("{}/users/{}".format(BASE_URL, employee_id)).json()
-
-    # Fetch all todos belonging to that employee
+    user = requests.get(
+        "{}/users/{}".format(url, employee_id)).json()
     todos = requests.get(
-        "{}/todos".format(BASE_URL), params={"userId": employee_id}
-    ).json()
+        "{}/todos".format(url),
+        params={"userId": employee_id}).json()
 
-    # Keep only the completed tasks
-    done_tasks = [task for task in todos if task.get("completed")]
+    done = [t.get("title") for t in todos if t.get("completed")]
 
-    # First line: progress summary
     print("Employee {} is done with tasks({}/{}):".format(
-        user.get("name"), len(done_tasks), len(todos)))
-
-    # Following lines: one tab + one space + title
-    for task in done_tasks:
-        print("\t {}".format(task.get("title")))
+        user.get("name"), len(done), len(todos)))
+    for title in done:
+        print("\t {}".format(title))
