@@ -1,1 +1,1 @@
-# API Advanced Project - Reddit API
+# API Advanced - Reddit API Project
